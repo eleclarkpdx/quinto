@@ -52,3 +52,6 @@ fn send_response(mut stream: TcpStream, status: &str, contents: &str, headers: S
         stream.write(response.as_bytes()).unwrap();
         stream.flush().unwrap();
 }
+
+#[cfg(test)]
+mod tests;
