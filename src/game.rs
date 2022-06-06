@@ -1,5 +1,3 @@
-use core::num;
-
 use rand::Rng;
 
 fn init_board() -> [[Option<u8>; 13 ]; 13] {
@@ -7,13 +5,12 @@ fn init_board() -> [[Option<u8>; 13 ]; 13] {
     board
 }
 
-fn get_tiles(num_tiles_needed: i32) -> Box<[u8]> {
-    // a player can't hold more than 5 tiles at once, so we will 
-    let mut tiles: [Option<u8>; 5] = [None; 5]
+fn get_tiles(num_tiles_needed: u8) -> Box<Vec<u8>> {
+    let mut tiles: Vec<u8> = vec![];
     let mut rng = rand::thread_rng();
-    for i in 0..num_tiles_needed {
+    for i in 0..(usize::from(num_tiles_needed)) {
         tiles[i] = rng.gen();
-        println!(tiles[i]);
+        println!("{:?}", tiles[i]);
     }
-    
+    Box::new(tiles)
 }
