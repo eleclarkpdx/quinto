@@ -50,3 +50,11 @@ pub fn update_board_with_tiles(mut board: Board, tiles: Box<Vec<TileCoord>>)
     }
     return Ok(board);
 }
+
+pub fn is_move_legal(mut board: Board, tile_move: Box<Vec<TileCoord>>)
+    -> bool {
+    // is the move in a line of length <5?
+    // does the move connect to a preexisting tile? (should be skipped if this is the first move)
+    // does the move sum to %5?
+    todo!()
+}
