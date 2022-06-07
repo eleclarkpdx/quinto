@@ -1,0 +1,46 @@
+body {
+    background-color: black;
+    color: lavender;
+    min-height: 100vh;
+}
+
+.container {
+    margin: auto;
+}
+
+.btn {
+    display: block;
+    width: 50px;
+    height: 50px;
+    margin: 20px;
+}
+
+.game-element {
+    background-color: lavender;
+    color: black;
+    padding: 20px;
+    margin: 20px;
+}
+
+.game {
+    width: 1000px;
+    padding: 0px 20px;
+}
+
+#controls {
+    width: 300px;
+    position: fixed;
+}
+
+#players {
+    width: 300px;
+    position: fixed;
+    bottom: 20px;
+}
+
+.aux {
+    width: 350px;
+    height: 100vh;
+    position: fixed;
+    right: 20px;
+}
