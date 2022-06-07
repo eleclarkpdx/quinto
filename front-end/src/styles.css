@@ -1,7 +1,8 @@
 :root {
-    --game-elem-bg: #3a3a43;
-    --empty-tile: #6f6f7e;
-    --played-tile: #cfcfe1;
+    --game-elem-bg: hsl(240, 7%, 25%);
+    --empty-tile: hsl(240, 7%, 45%);
+    --playable: hsl(240, 7%, 55%);
+    --played-tile: hsl(240, 7%, 90%);
 }
 
 body {
@@ -21,6 +22,15 @@ td {
     vertical-align: middle;
     background-color: var(--empty-tile);
     color: white;
+}
+
+.played-tile {
+    background-color: var(--played-tile);
+    color: black;
+}
+
+.playable:hover {
+    background-color: var(--playable);
 }
 
 .container {

@@ -1,5 +1,7 @@
 const handElem = document.querySelector("#hand")
 const boardElem = document.querySelector("#board")
+// state can be "viewing" or "playing"
+let state = "viewing";
 
 // dummy function that fills your hand
 const getTiles = (num_tiles) => {
@@ -11,9 +13,11 @@ const fillHand = () => {
     // TDOD: replace next line with with server request
     let drawnTiles = getTiles(5 - tilesInHand.length);
     tilesInHand = tilesInHand.concat(drawnTiles);
-    for (let tile in tilesInHand) {
+    for (let i = 0; i < tilesInHand.length; ++i) {
         let newTile = document.createElement("td");
-        newTile.innerHTML = `<td>${tile}</td>`
+        newTile.setAttribute("class", "playable");
+        newTile.setAttribute("id", `hand${i}`);
+        newTile.innerHTML = tilesInHand[i];
         handElem.append(newTile);
     }
 }
@@ -21,7 +25,6 @@ const fillHand = () => {
 const initBoard = () => {
     width = 13;
     height = 13;
-    let board = new Array(height);
     for (let y = 0; y < height; ++y) {
         let newRow = document.createElement("tr");
         boardElem.append(newRow);
@@ -32,4 +35,8 @@ const initBoard = () => {
             newRowElem.append(newTile);
         }
     }
+    let centerCell = boardElem.querySelectorAll("td")[(13*6)+6];
+    centerCell.innerHTML = 5;
+    centerCell.setAttribute("class","played-tile");
 }
+
