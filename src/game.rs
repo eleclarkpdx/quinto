@@ -14,11 +14,13 @@ pub struct TileCoord {
     pub y: usize
 }
 
+// Create a new empty Board (empty = all array entries are None.)
 pub fn init_board() -> Board {
     let board: Board = [[None; 13]; 13];
     board
 }
 
+// Randomly generate `num_tile_needed` values of 0-9.  
 pub fn generate_tiles(num_tiles_needed: u8) -> Box<Vec<u8>> {
     if num_tiles_needed == 0 {
         return Box::new(vec![]);
@@ -32,6 +34,10 @@ pub fn generate_tiles(num_tiles_needed: u8) -> Box<Vec<u8>> {
     Box::new(tiles)
 }
 
+// When given a pre-existing Board and a list of tiles-with-coordinates,
+// Replace the None values at those coordinates with the given tiles.
+// This function shouls be used to play tiles on the board.
+// Returns Err if any of the coordinates are already occupied with a non-None value.
 pub fn update_board_with_tiles(mut board: Board, tiles: Box<Vec<TileCoord>>)
     -> Result<Board, &'static str> {
     for tile_coord in *tiles {
