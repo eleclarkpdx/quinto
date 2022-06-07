@@ -16,7 +16,8 @@ pub struct TileCoord {
 
 // Create a new empty Board (empty = all array entries are None.)
 pub fn init_board() -> Board {
-    let board: Board = [[None; 13]; 13];
+    let mut board: Board = [[None; 13]; 13];
+    board[6][6] = Some(5);
     board
 }
 
@@ -41,6 +42,9 @@ pub fn generate_tiles(num_tiles_needed: u8) -> Box<Vec<u8>> {
 pub fn update_board_with_tiles(mut board: Board, tiles: Box<Vec<TileCoord>>)
     -> Result<Board, &'static str> {
     for tile_coord in *tiles {
+        if (tile_coord.x > 12) || (tile_coord.y > 12) {
+            return Err("coordinate index out of range");
+        }
         if board[tile_coord.y][tile_coord.x] == None {
             board[tile_coord.y][tile_coord.x] = Some(tile_coord.val);
         }
