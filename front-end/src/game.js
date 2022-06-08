@@ -1,9 +1,19 @@
-const handElem = document.querySelector("#hand")
-const boardElem = document.querySelector("#board")
+const handElem = document.querySelector("#hand");
+const boardElem = document.querySelector("#board");
 const boardWidth = 13;
 const boardHeight = 13;
-// state can be "viewing" or "playing"
-let state = "viewing";
+const moveOk = document.querySelector("#move-ok");
+const moveUndo = document.querySelector("#move-undo");
+const moveCancel = document.querySelector("#move-cancel");
+let state = "thinking";
+let move = [];
+
+moveOk.addEventListener("click", function handleClick(event) {
+    if (state == "playing") {
+        submitMove();
+        state = "thinking";
+    }
+});
 
 // dummy function that fills your hand
 const getTiles = (num_tiles) => {
@@ -17,16 +27,16 @@ const fillHand = () => {
     tilesInHand = tilesInHand.concat(drawnTiles);
     for (let i = 0; i < tilesInHand.length; ++i) {
         let newTile = document.createElement("td");
-        newTile.setAttribute("class", "playable-tile");
+        newTile.setAttribute("class", "tile");
         newTile.setAttribute("id", `hand${i}`);
         newTile.innerHTML = tilesInHand[i];
         handElem.append(newTile);
     }
 
-    let handTileElems = document.querySelectorAll(".playable-tile");
+    let handTileElems = document.querySelectorAll(".tile");
     handTileElems.forEach(handTileElem => {
         handTileElem.addEventListener("click", function handleClick(event) {
-            playHand(handTileElem)
+            playHand(handTileElems, handTileElem)
         });
     });
 }
@@ -47,33 +57,79 @@ const initBoard = () => {
     centerCell.setAttribute("class","played-tile");
 }
 
-const playHand = (playingThisTile) => {
-    let handTiles = Array.from(document.querySelectorAll(".playable-tile"));
-    console.log(`played tile ${playingThisTile.id}`);
-    playingThisTile.setAttribute("class", "playing-tile");
-    setPlayableLocations();
+const playHand = (hand, playingThisTile) => {
+    playTile(playingThisTile);
+    state = "playing";
+}
     
+const playTile = (playingThisTile) => {
+    playingThisTile.setAttribute("class", "playing-tile");
+    //setPlayableLocations();
+
+    let board = boardElem.querySelectorAll("td");
+    let playableLocations = Array.from(document.querySelectorAll(".open-tile"));
+    for (let i = 0; i < board.length; ++i) {
+        if (playableLocations.includes(board[i])) {
+            board[i].addEventListener("click", function handleClick(event) {
+                board[i].setAttribute("class", "played-tile");
+                board[i].innerHTML = playingThisTile.innerHTML;
+
+                move.push([playingThisTile.innerHTML, i]);
+                playingThisTile.remove();
+
+                setPlayableLocations();
+            });
+        }
+    }
 }
 
 // wildly inefficient
 const setPlayableLocations = () => {
-    let board = boardElem.querySelectorAll("td");
-    let occupied = []; 
-    for (let x = 0; x < boardWidth; ++x) {
-        for (let y = 0; y < boardHeight; ++y) {
-            if (board[(boardWidth*y) + x].innerHTML != " ") {
-                occupied.push([x, y]);
+    let openTiles = boardElem.querySelectorAll(".open-tile");
+    openTiles.forEach((tile) => {
+        tile.removeAttribute("class");
+    });
+
+    if (state == "thinking") {
+        let board = boardElem.querySelectorAll("td");
+        let occupied = []; 
+        for (let x = 0; x < boardWidth; ++x) {
+            for (let y = 0; y < boardHeight; ++y) {
+                if (board[(boardWidth*y) + x].innerHTML != " ") {
+                    occupied.push([x, y]);
+                }
+            }
+        }
+        // TODO: DRY
+        for (let i = 0; i < occupied.length; ++i) {
+            let up = board[boardWidth*(occupied[i][1]-1) + occupied[i][0]];
+            if (up.innerHTML == " ") {
+                up.setAttribute("class","open-tile");
+            }
+            let down = board[boardWidth*(occupied[i][1]+1) + occupied[i][0]];
+            if (down.innerHTML == " ") {
+                down.setAttribute("class","open-tile");
+            }
+            let left = board[(boardWidth*occupied[i][1]) + (occupied[i][0]-1)];
+            if (left.innerHTML == " ") {
+                left.setAttribute("class","open-tile");
+            }
+            let right = board[(boardWidth*occupied[i][1]) + (occupied[i][0]+1)];
+            if (right.innerHTML == " ") {
+                right.setAttribute("class","open-tile");
             }
         }
     }
-    for (let i = 0; i < occupied.length; ++i) {
-        // up
-        board[boardWidth*(occupied[i][1]-1) + occupied[i][0]].setAttribute("class","playing-tile");
-        // down
-        board[boardWidth*(occupied[i][1]+1) + occupied[i][0]].setAttribute("class","playing-tile");
-        // left
-        board[(boardWidth*occupied[i][1]) + (occupied[i][0]-1)].setAttribute("class","playing-tile");
-        // right
-        board[(boardWidth*occupied[i][1]) + (occupied[i][0]+1)].setAttribute("class","playing-tile");
+    else if (state == "playing") {
+        let lastMove = move[move.length - 1];
+        let upOccupied = ((lastMove[1]-boardWidth) !== " ");
+        let downOccupied = ((lastMove[1]+boardWidth) !== " ");
+        let leftOccupied = ((lastMove[1]-1) !== " ");
+        let rightOccupied = ((lastMove[1]+1) !== " ");
+        if leftOccupied
     }
+}
+
+const submitMove = () => {
+
 }

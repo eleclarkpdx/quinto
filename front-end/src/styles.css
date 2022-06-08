@@ -1,10 +1,9 @@
 :root {
     --game-elem-bg: hsl(240, 7%, 25%);
     --empty-tile: hsl(240, 7%, 45%);
-    --playable-tile: hsl(240, 7%, 55%);
     --played-tile: hsl(240, 7%, 90%);
-    --playing-tile: hsl(120, 7%, 55%);
-    --playing-tile-hover: hsl(120, 7%, 65%);
+    --open-tile: hsl(120, 7%, 55%);
+    --open-tile-hover: hsl(120, 7%, 65%);
 }
 
 body {
@@ -31,16 +30,16 @@ td {
     color: black;
 }
 
-.playable-tile:hover {
-    background-color: var(--playable-tile);
-}
-
 .playing-tile {
-    background-color: var(--playing-tile);
+    background-color: var(--empty-tile);
 }
 
-.playing-tile:hover {
-    background-color: var(--playing-tile-hover);
+.open-tile {
+    background-color: var(--open-tile);
+}
+
+.open-tile:hover {
+    background-color: var(--open-tile-hover);
 }
 
 
@@ -65,6 +64,11 @@ td {
 .tile {
     background-color: var(--played-tile);
     color: black;
+}
+
+.tile:hover {
+    background-color: var(--empty-tile);
+    color: white;
 }
 
 /* TODO: DRY */
