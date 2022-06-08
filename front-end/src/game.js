@@ -97,7 +97,16 @@ const playTile = (playingThisTile) => {
                 if (playingThisTile) {
                     board[i].setAttribute("class", "playing-tile");
                     board[i].innerHTML = playingThisTile.innerHTML;
-                    move.push([playingThisTile.innerHTML, i]);
+
+                    pushOk = true;
+                    move.forEach((tile) => {
+                        if (tile[1] === i) {
+                            pushOk = false;
+                        }
+                    });
+                    if (pushOk === true) {
+                        move.push([playingThisTile.innerHTML, i]);
+                    }
                     playingThisTile = null;
                 }
             });
@@ -256,7 +265,7 @@ const cancelMove = () => {
 }
 
 // this could really use an array
-const getScore = () => {
+const getScore = (isColumn, isRow) => {
     let coreScore = 0;
     let auxScore = 0;
     let valid = true;
