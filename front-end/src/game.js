@@ -23,11 +23,13 @@ submitMove.addEventListener("click", function handleClick(event) {
     else {
         cancelMove();
     }
+    move = [];
 });
 
 
 moveCancel.addEventListener("click", function handleClick(event) {
     cancelMove();
+    move = [];
 });
 
 
@@ -189,20 +191,38 @@ const moveOk = () => {
         return false;
     }
 
-    // TODO: allows S-shaped moves
-    let isColumn = false;
-    let isRow = false;
-    let prevCoord = move[0][1];
-    for (let i = 1; i < move.length; ++i) {
-        if ((prevCoord === move[i][1]-13) || (prevCoord === move[i][1]+13)) {
-            isColumn = true;
+    let isColumn = true;
+    let isRow = true;
+    let col = null;
+    for (let x = 0; x < boardWidth; x++) {
+        for (let y = 0; y < boardHeight; y++) {
+            yCoord = y * boardWidth;
+            if (board[yCoord + x].classList.contains("playing-tile")) {
+                if (col === null) {
+                    col = x;
+                }
+                else if (col !== x) {
+                    isColumn = false;
+                }
+            }
         }
-        else if ((prevCoord === move[i][1]-1) || (prevCoord === move[i][1]+1)) {
-            isRow = true;
-        }
-        prevCoord = move[i][1];
     }
-    if (isColumn && isRow) {
+    let row = null;
+    for (let y = 0; y < boardWidth; y++) {
+        for (let x = 0; x < boardHeight; x++) {
+            yCoord = y * boardWidth;
+            if (board[yCoord + x].classList.contains("playing-tile")) {
+                if (row === null) {
+                    row = y;
+                }
+                else if (row !== y) {
+                    isRow = false;
+                }
+            }
+        }
+    }
+    console.log(`isColumn=${isColumn} && isRow=${isRow}`);
+    if (!isRow && !isColumn) {
         return false;
     }
 
@@ -247,7 +267,7 @@ const moveOk = () => {
         return false;
     }
 
-    if (getScore()%5 !== 0) {
+    if (getScore(isColumn, isRow)%5 !== 0) {
         return false;
     }
 
@@ -266,25 +286,80 @@ const cancelMove = () => {
 
 // this could really use an array
 const getScore = (isColumn, isRow) => {
+    let board = boardElem.querySelectorAll("td");
     let coreScore = 0;
     let auxScore = 0;
     let valid = true;
-    move.forEach((tile) => {
-        coreScore += parseInt(tile[0]);
-        let leftScore = sumLeft(tile[1]-1);
-        let rightScore = sumRight(tile[1]+1);
-        let upScore = sumUp(tile[1]-13);
-        let downScore = sumDown(tile[1]+13);
+    if (isRow && isColumn) {
+        //can only occur if only one tile was played
+        tile = move[0];
+        coreScore = tile[0];
+        let leftScore = sumLeft(tile[1]);
+        let rightScore = sumRight(tile[1]);
+        let upScore = sumUp(tile[1]);
+        let downScore = sumDown(tile[1]);
         if ((leftScore%5 !== 0) || (rightScore%5 !== 0) || (upScore%5 !== 0) || (downScore%5 !== 0)) {
             valid = false;
         }
         auxScore += leftScore + rightScore + upScore + downScore;
-    })
+    }
+    else if (isRow) {
+        let left = getFurthestRowTile(move[0][1], -1);
+        let rightmost = getFurthestRowTile(move[0][1], 1);
+        while (left <= rightmost) {
+            coreScore += parseInt(board[left].innerHTML);
+            left += 1;
+        }
+        move.forEach((tile) => {
+            let upScore = sumUp(tile[1]);
+            let downScore = sumDown(tile[1]);
+            if ((upScore%5 !== 0) || (downScore%5 !== 0)) {
+                valid = false;
+            }
+            auxScore += upScore + downScore;
+        });
+    }
+    else if (isColumn) {
+        let high = getFurthestColTile(move[0][1], -13);
+        let lowest = getFurthestColTile(move[0][1], 13);
+        while (high <= lowest) {
+            coreScore += parseInt(board[high].innerHTML);
+            high += 13;
+        }
+        move.forEach((tile) => {
+            let leftScore = sumLeft(tile[1]);
+            let rightScore = sumRight(tile[1]);
+            if ((leftScore%5 !== 0) || (rightScore%5 !== 0)) {
+                valid = false;
+            }
+            auxScore += leftScore + rightScore;
+        });
+    }
     if (valid) {
         return auxScore + coreScore;
     }
     else {
         return -1; //arbitrary invalid value
+    }
+}
+
+const getFurthestRowTile = (coord, offset) => {
+    let board = boardElem.querySelectorAll("td");
+    if ((coord%13 == 0) || (board[coord].classList.contains("empty-tile"))) {
+        return coord-offset;
+    }
+    else {
+        return getFurthestRowTile(coord+offset, offset);
+    }
+}
+
+const getFurthestColTile = (coord, offset) => {
+    let board = boardElem.querySelectorAll("td");
+    if ((coord < boardWidth) || (coord > boardWidth*(boardHeight-1)) || (board[coord].classList.contains("empty-tile"))) {
+        return coord-offset;
+    }
+    else {
+        return getFurthestRowTile(coord+offset, offset);
     }
 }
 
