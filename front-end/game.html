@@ -14,17 +14,22 @@
     -->
 </head>
 <body>
-    <div class="container row">
+    <div class="container">
         <div class="game">
             <div class="game-element">
                 <table id="hand"></table>
-                <div id="controls">
-                    <button id="move-cancel" class="btn btn-danger">✕</button>
-                    <button id="move-ok" class="btn btn-success">✓</button>
-                </div>
             </div>
             <div class="game-element">
                 <table id="board"></table>
+            </div>
+        </div>
+        <div class="controls-container">
+            <div id="controls">
+                <button id="move-cancel" class="btn btn-danger">Cancel</button>
+                <button id="move-ok" class="btn btn-success">Accept</button>
+            </div>
+            <div class="score">
+                Total score: <span id="total-score"></span>
             </div>
         </div>
         <div class="aux">

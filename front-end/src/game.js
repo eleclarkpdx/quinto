@@ -6,6 +6,8 @@ const submitMove = document.querySelector("#move-ok");
 const moveCancel = document.querySelector("#move-cancel");
 let state = "thinking";
 let move = [];
+let totalScore = 0;
+let currentScore = 0;
 
 submitMove.addEventListener("click", function handleClick(event) {
     if (state == "playing") {
@@ -19,6 +21,7 @@ submitMove.addEventListener("click", function handleClick(event) {
             tile.remove();
         });
         fillHand();
+        document.querySelector("#total-score").innerHTML = totalScore;
     }
     else {
         cancelMove();
@@ -37,7 +40,7 @@ moveCancel.addEventListener("click", function handleClick(event) {
 const getTiles = (num_tiles) => {
     let arr = [];
     for (let i = 0; i < num_tiles; ++i) {
-        arr.push(i);
+        arr.push(5);
     }
     return arr;
 }
@@ -267,8 +270,12 @@ const moveOk = () => {
         return false;
     }
 
-    if (getScore(isColumn, isRow)%5 !== 0) {
+    let score = getScore(isColumn, isRow);
+    if (score%5 !== 0) {
         return false;
+    }
+    else {
+        totalScore += score;
     }
 
     return true;
@@ -293,26 +300,42 @@ const getScore = (isColumn, isRow) => {
     if (isRow && isColumn) {
         //can only occur if only one tile was played
         tile = move[0];
-        coreScore = tile[0];
-        let leftScore = sumLeft(tile[1]);
-        let rightScore = sumRight(tile[1]);
-        let upScore = sumUp(tile[1]);
-        let downScore = sumDown(tile[1]);
+        let [upScore, downScore, leftScore, rightScore] = [0, 0, 0, 0];
+        let tileScore = parseInt(tile[0]);
+        if (board[tile[1]-13].innerHTML !== " ") {
+            upScore = sumUp(tile[1]-13) + tileScore;
+        }
+        if (board[tile[1]+13].innerHTML !== " ") {
+            downScore = sumDown(tile[1]+13) + tileScore;
+        }
+        if (board[tile[1]-1].innerHTML !== " ") {
+            leftScore = sumLeft(tile[1]-1) + tileScore;
+        }
+        if (board[tile[1]+1].innerHTML !== " ") {
+            rightScore = sumRight(tile[1]+1) + tileScore;
+        }
         if ((leftScore%5 !== 0) || (rightScore%5 !== 0) || (upScore%5 !== 0) || (downScore%5 !== 0)) {
             valid = false;
         }
         auxScore += leftScore + rightScore + upScore + downScore;
     }
     else if (isRow) {
-        let left = getFurthestRowTile(move[0][1], -1);
-        let rightmost = getFurthestRowTile(move[0][1], 1);
+        let left = getFurthestRowTile(move[0][1], -1, 0);
+        let rightmost = getFurthestRowTile(move[0][1], 1, 12);
         while (left <= rightmost) {
             coreScore += parseInt(board[left].innerHTML);
             left += 1;
         }
         move.forEach((tile) => {
-            let upScore = sumUp(tile[1]);
-            let downScore = sumDown(tile[1]);
+            let upScore = 0;
+            let downScore = 0;
+            let tileScore = parseInt(tile[0]);
+            if (board[tile[1]-13].innerHTML !== " ") {
+                upScore = sumUp(tile[1]-13) + tileScore;
+            }
+            if (board[tile[1]+13].innerHTML !== " ") {
+                downScore = sumDown(tile[1]+13) + tileScore;
+            }
             if ((upScore%5 !== 0) || (downScore%5 !== 0)) {
                 valid = false;
             }
@@ -327,8 +350,15 @@ const getScore = (isColumn, isRow) => {
             high += 13;
         }
         move.forEach((tile) => {
-            let leftScore = sumLeft(tile[1]);
-            let rightScore = sumRight(tile[1]);
+            let leftScore = 0;
+            let rightScore = 0;
+            let tileScore = parseInt(tile[0]);
+            if (board[tile[1]-1].innerHTML !== " ") {
+                leftScore = sumLeft(tile[1]-1) + tileScore;
+            }
+            if (board[tile[1]+1].innerHTML !== " ") {
+                rightScore = sumRight(tile[1]+1) + tileScore;
+            }
             if ((leftScore%5 !== 0) || (rightScore%5 !== 0)) {
                 valid = false;
             }
@@ -343,9 +373,9 @@ const getScore = (isColumn, isRow) => {
     }
 }
 
-const getFurthestRowTile = (coord, offset) => {
+const getFurthestRowTile = (coord, offset, stopAt) => {
     let board = boardElem.querySelectorAll("td");
-    if ((coord%13 == 0) || (board[coord].classList.contains("empty-tile"))) {
+    if ((coord%13 == stopAt) || (board[coord].classList.contains("empty-tile"))) {
         return coord-offset;
     }
     else {
@@ -355,7 +385,7 @@ const getFurthestRowTile = (coord, offset) => {
 
 const getFurthestColTile = (coord, offset) => {
     let board = boardElem.querySelectorAll("td");
-    if ((coord < boardWidth) || (coord > boardWidth*(boardHeight-1)) || (board[coord].classList.contains("empty-tile"))) {
+    if ((coord < 0) || (coord > boardWidth*boardHeight) || (board[coord].classList.contains("empty-tile"))) {
         return coord-offset;
     }
     else {
@@ -365,7 +395,7 @@ const getFurthestColTile = (coord, offset) => {
 
 const sumLeft = (coord) => {
     let board = boardElem.querySelectorAll("td");
-    if ((coord%13 == 0) || !(board[coord].classList.contains("played-tile"))) {
+    if ((coord%13 == 0) || (board[coord].classList.contains("empty-tile"))) {
         return 0;
     }
     else {
@@ -375,7 +405,7 @@ const sumLeft = (coord) => {
 
 const sumRight = (coord) => {
     let board = boardElem.querySelectorAll("td");
-    if ((coord%13 == 12) || !(board[coord].classList.contains("played-tile"))) {
+    if ((coord%13 == 12) || (board[coord].classList.contains("empty-tile"))) {
         return 0;
     }
     else {
@@ -385,7 +415,7 @@ const sumRight = (coord) => {
 
 const sumUp = (coord) => {
     let board = boardElem.querySelectorAll("td");
-    if ((coord < 14) || !(board[coord].classList.contains("played-tile"))) {
+    if ((coord < 14) || (board[coord].classList.contains("empty-tile"))) {
         return 0;
     }
     else {
@@ -395,7 +425,7 @@ const sumUp = (coord) => {
 
 const sumDown = (coord) => {
     let board = boardElem.querySelectorAll("td");
-    if ((coord > ((boardHeight-1)*boardWidth)) || !(board[coord].classList.contains("played-tile"))) {
+    if ((coord > ((boardHeight-1)*boardWidth)) || (board[coord].classList.contains("empty-tile"))) {
         return 0;
     }
     else {

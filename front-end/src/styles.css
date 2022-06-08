@@ -47,10 +47,12 @@ td {
 
 .container {
     margin: auto;
+    display: flex;
 }
 
 .game {
     width: fit-content;
+    display: inline-block;
     padding: 20px 20px;
 }
 
@@ -73,23 +75,29 @@ td {
     color: white;
 }
 
+.controls-container {
+    width: 200px;
+    padding: 20px;
+    margin: 40px 20px;
+    background-color: var(--game-elem-bg);
+}
+
+.score {
+    margin: 50px 0px;
+}
 /* TODO: DRY */
 #hand {
-    display: inline-block;
-    width: fit-content;
+    margin: auto;
     vertical-align: top;
 }
 #controls {
-    display: inline-block;
     width: fit-content;
-    vertical-align: top;
-    position: absolute;
-    right: 20px;
+    margin: auto;
 }
 
 #controls .btn {
     display: inline-block;
-    width: 40px;
+    width: fit-content;
     height: 40px;
     margin: 2px;
 }
