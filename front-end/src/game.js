@@ -2,50 +2,53 @@ const handElem = document.querySelector("#hand");
 const boardElem = document.querySelector("#board");
 const boardWidth = 13;
 const boardHeight = 13;
-const moveOk = document.querySelector("#move-ok");
+const submitMove = document.querySelector("#move-ok");
 const moveCancel = document.querySelector("#move-cancel");
 let state = "thinking";
 let move = [];
 
-moveOk.addEventListener("click", function handleClick(event) {
+submitMove.addEventListener("click", function handleClick(event) {
     if (state == "playing") {
-        console.log(submitMove());
         state = "thinking";
     }
-    Array.from(document.querySelectorAll(".playing-tile")).forEach((tile) => {
-        tile.setAttribute("class", "played-tile");
-    });
-    Array.from(handElem.querySelectorAll(".empty-tile")).forEach((tile) => {
-        tile.remove();
-    });
+    if (moveOk()) {
+        Array.from(document.querySelectorAll(".playing-tile")).forEach((tile) => {
+            tile.setAttribute("class", "played-tile");
+        });
+        Array.from(handElem.querySelectorAll(".empty-tile")).forEach((tile) => {
+            tile.remove();
+        });
+        fillHand();
+    }
+    else {
+        cancelMove();
+    }
 });
 
+
 moveCancel.addEventListener("click", function handleClick(event) {
-    Array.from(document.querySelectorAll(".playing-tile")).forEach((tile) => {
-        tile.setAttribute("class", "empty-tile");
-        tile.innerHTML = " ";
-    });
-    Array.from(handElem.querySelectorAll(".empty-tile")).forEach((tile) => {
-        tile.setAttribute("class", "tile");
-    });
+    cancelMove();
 });
 
 
 // dummy function that fills your hand
 const getTiles = (num_tiles) => {
-    return [0, 1, 2, 3, 4];
+    let arr = [];
+    for (let i = 0; i < num_tiles; ++i) {
+        arr.push(i);
+    }
+    return arr;
 }
 
 const fillHand = () => {
-    let tilesInHand = Array.from(handElem.getElementsByTagName("td"));
+    let tilesInHand = handElem.querySelectorAll("td");
     // TDOD: replace next line with with server request
     let drawnTiles = getTiles(5 - tilesInHand.length);
-    tilesInHand = tilesInHand.concat(drawnTiles);
-    for (let i = 0; i < tilesInHand.length; ++i) {
+    for (let i = 0; i < drawnTiles.length; ++i) {
         let newTile = document.createElement("td");
         newTile.setAttribute("class", "tile");
         newTile.setAttribute("id", `hand${i}`);
-        newTile.innerHTML = tilesInHand[i];
+        newTile.innerHTML = drawnTiles[i];
         handElem.append(newTile);
     }
 
@@ -156,7 +159,7 @@ const setPlayableLocations = () => {
 // 2) be played in a line
 // 3) not cause the board to contain more than 5 tiles in sequence without empty spaces
 // 4) sum to a multiple of 5 on all axes
-const submitMove = () => {
+const moveOk = () => {
     let board = boardElem.querySelectorAll("td");
     let floating = true;
     for (let i = 0; i < move.length; ++i) {
@@ -177,6 +180,7 @@ const submitMove = () => {
         return false;
     }
 
+    // TODO: allows S-shaped moves
     let isColumn = false;
     let isRow = false;
     let prevCoord = move[0][1];
@@ -234,13 +238,83 @@ const submitMove = () => {
         return false;
     }
 
-
-
+    if (getScore()%5 !== 0) {
+        return false;
+    }
 
     return true;
 }
 
+const cancelMove = () => {
+    Array.from(document.querySelectorAll(".playing-tile")).forEach((tile) => {
+        tile.setAttribute("class", "empty-tile");
+        tile.innerHTML = " ";
+    });
+    Array.from(handElem.querySelectorAll(".empty-tile")).forEach((tile) => {
+        tile.setAttribute("class", "tile");
+    });
+}
 
+// this could really use an array
 const getScore = () => {
+    let coreScore = 0;
+    let auxScore = 0;
+    let valid = true;
+    move.forEach((tile) => {
+        coreScore += parseInt(tile[0]);
+        let leftScore = sumLeft(tile[1]-1);
+        let rightScore = sumRight(tile[1]+1);
+        let upScore = sumUp(tile[1]-13);
+        let downScore = sumDown(tile[1]+13);
+        if ((leftScore%5 !== 0) || (rightScore%5 !== 0) || (upScore%5 !== 0) || (downScore%5 !== 0)) {
+            valid = false;
+        }
+        auxScore += leftScore + rightScore + upScore + downScore;
+    })
+    if (valid) {
+        return auxScore + coreScore;
+    }
+    else {
+        return -1; //arbitrary invalid value
+    }
+}
 
+const sumLeft = (coord) => {
+    let board = boardElem.querySelectorAll("td");
+    if ((coord%13 == 0) || !(board[coord].classList.contains("played-tile"))) {
+        return 0;
+    }
+    else {
+        return parseInt(board[coord].innerHTML) + sumLeft(coord-1);
+    }
+}
+
+const sumRight = (coord) => {
+    let board = boardElem.querySelectorAll("td");
+    if ((coord%13 == 12) || !(board[coord].classList.contains("played-tile"))) {
+        return 0;
+    }
+    else {
+        return parseInt(board[coord].innerHTML) + sumLeft(coord+1);
+    }
+}
+
+const sumUp = (coord) => {
+    let board = boardElem.querySelectorAll("td");
+    if ((coord < 14) || !(board[coord].classList.contains("played-tile"))) {
+        return 0;
+    }
+    else {
+        return parseInt(board[coord].innerHTML) + sumLeft(coord-boardWidth);
+    }
+}
+
+const sumDown = (coord) => {
+    let board = boardElem.querySelectorAll("td");
+    if ((coord > ((boardHeight-1)*boardWidth)) || !(board[coord].classList.contains("played-tile"))) {
+        return 0;
+    }
+    else {
+        return parseInt(board[coord].innerHTML) + sumLeft(coord+boardWidth);
+    }
 }
