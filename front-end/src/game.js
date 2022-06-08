@@ -17,7 +17,7 @@ submitMove.addEventListener("click", function handleClick(event) {
         Array.from(document.querySelectorAll(".playing-tile")).forEach((tile) => {
             tile.setAttribute("class", "played-tile");
         });
-        Array.from(handElem.querySelectorAll(".empty-tile")).forEach((tile) => {
+        Array.from(document.querySelectorAll(".played-hand-tile")).forEach((tile) => {
             tile.remove();
         });
         fillHand();
@@ -39,8 +39,8 @@ moveCancel.addEventListener("click", function handleClick(event) {
 // dummy function that fills your hand
 const getTiles = (num_tiles) => {
     let arr = [];
-    for (let i = 0; i < num_tiles; ++i) {
-        arr.push(5);
+    for (let i = 0; i < (num_tiles+5); ++i) {
+        arr.push(i);
     }
     return arr;
 }
@@ -60,7 +60,9 @@ const fillHand = () => {
     let handTileElems = document.querySelectorAll(".tile");
     handTileElems.forEach(handTileElem => {
         handTileElem.addEventListener("click", function handleClick(event) {
-            playHand(handTileElems, handTileElem)
+            if (!document.querySelector(".playing-hand-tile")) {
+                playHand(handTileElems, handTileElem)
+            }
         });
     });
 }
@@ -91,7 +93,7 @@ const playHand = (hand, playingThisTile) => {
 }
     
 const playTile = (playingThisTile) => {
-    playingThisTile.setAttribute("class", "empty-tile");
+    playingThisTile.setAttribute("class", "playing-hand-tile");
     //setPlayableLocations();
 
     let board = boardElem.querySelectorAll("td");
@@ -100,6 +102,7 @@ const playTile = (playingThisTile) => {
         if (playableLocations.includes(board[i])) {
             board[i].addEventListener("click", function handleClick(event) {
                 if (playingThisTile) {
+                    playingThisTile.setAttribute("class", "played-hand-tile");
                     board[i].setAttribute("class", "playing-tile");
                     board[i].innerHTML = playingThisTile.innerHTML;
 
@@ -286,7 +289,7 @@ const cancelMove = () => {
         tile.setAttribute("class", "empty-tile");
         tile.innerHTML = " ";
     });
-    Array.from(handElem.querySelectorAll(".empty-tile")).forEach((tile) => {
+    Array.from(handElem.querySelectorAll(".played-hand-tile")).forEach((tile) => {
         tile.setAttribute("class", "tile");
     });
 }

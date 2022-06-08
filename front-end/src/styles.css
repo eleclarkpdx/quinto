@@ -1,10 +1,11 @@
 :root {
     --game-elem-bg: hsl(240, 7%, 25%);
+    --selection: hsl(240, 7%, 35%);
     --empty-tile: hsl(240, 7%, 45%);
     --playing-tile: hsl(240, 7%, 80%);
     --played-tile: hsl(240, 7%, 90%);
-    --open-tile: hsl(120, 7%, 55%);
-    --open-tile-hover: hsl(120, 7%, 65%);
+    --open-tile: hsl(120, 20%, 55%);
+    --open-tile-hover: hsl(120, 20%, 65%);
 }
 
 body {
@@ -42,6 +43,15 @@ td {
 
 .empty-tile:hover {
     background-color: var(--empty-tile-hover);
+}
+
+.playing-hand-tile {
+    background-color: var(--empty-tile);
+    color: white;
+}
+
+.played-hand-tile {
+    visibility: hidden;
 }
 
 
@@ -82,8 +92,17 @@ td {
     background-color: var(--game-elem-bg);
 }
 
-.score {
+.social-container {
+    width: 300px;
+    margin: 20px;
+}
+
+.score-container {
     margin: 50px 0px;
+}
+
+.score {
+    color: var(--open-tile-hover);
 }
 /* TODO: DRY */
 #hand {
@@ -102,15 +121,14 @@ td {
     margin: 2px;
 }
 
-#players {
-    width: 300px;
-    position: absolute;
-    bottom: 20px;
+#rooms {
+    margin: 20px;
+    padding: 20px;
+    background-color: var(--game-elem-bg);
 }
 
-.aux {
-    width: 350px;
-    height: 100vh;
-    position: fixed;
-    right: 20px;
+#players {
+    margin: 20px;
+    padding: 20px;
+    background-color: var(--game-elem-bg);
 }

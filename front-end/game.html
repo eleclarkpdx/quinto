@@ -15,6 +15,27 @@
 </head>
 <body>
     <div class="container">
+        <div class="social-container">
+            <div id="rooms">
+                <t2>Rooms:</t2>
+                <ul>
+                    <li>lorem</li>
+                    <li>ipsum</li>
+                    <li>dolor</li>
+                    <li>sit</li>
+                    <li>amet</li>
+                </ul>
+            </div>
+            <div id="players">
+                <t2>Players:</t2>
+                <ul>
+                    <li>Lorem <span class="score">(score)</span></li>
+                    <li>ipsum <span class="score">(score)</span></li>
+                    <li>dolor <span class="score">(score)</span></li>
+                    <li>amet <span class="score">(score)</span></li>
+                </ul>
+            </div>
+        </div>
         <div class="game">
             <div class="game-element">
                 <table id="hand"></table>
@@ -28,21 +49,8 @@
                 <button id="move-cancel" class="btn btn-danger">Cancel</button>
                 <button id="move-ok" class="btn btn-success">Accept</button>
             </div>
-            <div class="score">
-                Total score: <span id="total-score"></span>
-            </div>
-        </div>
-        <div class="aux">
-            <div id="players" class="game-element">
-                <t2>Players:</t2>
-                <hr>
-                <ul>
-                    <li>lorem</li>
-                    <li>ipsum</li>
-                    <li>dolor</li>
-                    <li>sit</li>
-                    <li>amet</li>
-                </ul>
+            <div class="score-container">
+                Total score: <span id="total-score" class="score"></span>
             </div>
         </div>
     </div>
