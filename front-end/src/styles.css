@@ -1,6 +1,7 @@
 :root {
     --game-elem-bg: hsl(240, 7%, 25%);
     --empty-tile: hsl(240, 7%, 45%);
+    --playing-tile: hsl(240, 7%, 80%);
     --played-tile: hsl(240, 7%, 90%);
     --open-tile: hsl(120, 7%, 55%);
     --open-tile-hover: hsl(120, 7%, 65%);
@@ -31,15 +32,16 @@ td {
 }
 
 .playing-tile {
+    background-color: var(--playing-tile);
+    color: black;
+}
+
+.empty-tile {
     background-color: var(--empty-tile);
 }
 
-.open-tile {
-    background-color: var(--open-tile);
-}
-
-.open-tile:hover {
-    background-color: var(--open-tile-hover);
+.empty-tile:hover {
+    background-color: var(--empty-tile-hover);
 }
 
 
