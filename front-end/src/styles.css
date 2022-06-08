@@ -1,8 +1,10 @@
 :root {
     --game-elem-bg: hsl(240, 7%, 25%);
     --empty-tile: hsl(240, 7%, 45%);
-    --playable: hsl(240, 7%, 55%);
+    --playable-tile: hsl(240, 7%, 55%);
     --played-tile: hsl(240, 7%, 90%);
+    --playing-tile: hsl(120, 7%, 55%);
+    --playing-tile-hover: hsl(120, 7%, 65%);
 }
 
 body {
@@ -29,9 +31,18 @@ td {
     color: black;
 }
 
-.playable:hover {
-    background-color: var(--playable);
+.playable-tile:hover {
+    background-color: var(--playable-tile);
 }
+
+.playing-tile {
+    background-color: var(--playing-tile);
+}
+
+.playing-tile:hover {
+    background-color: var(--playing-tile-hover);
+}
+
 
 .container {
     margin: auto;
