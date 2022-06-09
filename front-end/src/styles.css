@@ -1,4 +1,5 @@
 :root {
+    --header-bg: hsl(240, 7%, 20%);
     --game-elem-bg: hsl(240, 7%, 25%);
     --selection: hsl(240, 7%, 35%);
     --empty-tile: hsl(240, 7%, 45%);
@@ -14,6 +15,13 @@ body {
     min-height: 100vh;
 }
 
+h2 {
+    font-size: 1.5em;
+    padding: 10px;
+    background-color: var(--header-bg);
+    border-bottom: 2px solid var(--played-tile);
+}
+
 table {
     border-collapse: separate;
 }
@@ -25,6 +33,14 @@ td {
     vertical-align: middle;
     background-color: var(--empty-tile);
     color: white;
+}
+
+ul, ol {
+    padding: 20px;
+}
+
+li {
+    list-style-type: none;
 }
 
 .played-tile {
@@ -97,7 +113,12 @@ td {
     margin: 20px;
 }
 
+.selected {
+    background-color: var(--selection);
+}
+
 .score-container {
+    font-size: 1.5em;
     margin: 50px 0px;
 }
 
@@ -123,12 +144,10 @@ td {
 
 #rooms {
     margin: 20px;
-    padding: 20px;
     background-color: var(--game-elem-bg);
 }
 
 #players {
     margin: 20px;
-    padding: 20px;
     background-color: var(--game-elem-bg);
 }
