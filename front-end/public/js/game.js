@@ -39,8 +39,8 @@ moveCancel.addEventListener("click", function handleClick(event) {
 // dummy function that fills your hand
 const getTiles = (num_tiles) => {
     let arr = [];
-    for (let i = 0; i < (num_tiles+5); ++i) {
-        arr.push(i);
+    for (let i = 0; i < (num_tiles); ++i) {
+        arr.push(Math.floor((Math.random()*10)));
     }
     return arr;
 }
@@ -73,7 +73,7 @@ const getRooms = () => {
   xmlHttp.open("GET", "list_rooms", false);
   xmlHttp.send(null);
   console.log(xmlHttp.responseText);
-  rooms.innerHTML = `<t2>Rooms:</t2><ul><li>${xmlHttp.responseText}</li></ul>`
+  rooms.innerHTML = `<h2>Rooms:</h2><ul><li>${xmlHttp.responseText}</li></ul>`
 }
 
 const initBoard = () => {
@@ -186,6 +186,10 @@ const setPlayableLocations = () => {
 // 3) not cause the board to contain more than 5 tiles in sequence without empty spaces
 // 4) sum to a multiple of 5 on all axes
 const moveOk = () => {
+    //skipping your turn is always okay
+    if (move.length === 0) {
+        return true;
+    }
     let board = boardElem.querySelectorAll("td");
     let floating = true;
     for (let i = 0; i < move.length; ++i) {
