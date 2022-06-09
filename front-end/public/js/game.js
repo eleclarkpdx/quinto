@@ -201,7 +201,7 @@ const moveOk = () => {
     for (let x = 0; x < boardWidth; ++x) {
         for (let y = 0; y < boardHeight; ++y) {
             yCoord = y * boardWidth;
-            if (board[yCoord + x].classList.contains("empty-tile")) {
+            if (((yCoord + x)%13 === 0) || board[yCoord + x].classList.contains("empty-tile")) {
                 if (colCount > maxColCount) {
                     maxColCount = colCount;
                 }
@@ -220,7 +220,7 @@ const moveOk = () => {
     for (let y = 0; y < boardHeight; ++y) {
         for (let x = 0; x < boardWidth; ++x) {
             yCoord = y * boardWidth;
-            if (board[yCoord + x].classList.contains("empty-tile")) {
+            if (((yCoord + x)%13 === 0) || board[yCoord + x].classList.contains("empty-tile")) {
                 if (rowCount > maxRowCount) {
                     maxRowCount = rowCount;
                 }
@@ -285,8 +285,8 @@ const getScore = (isColumn, isRow) => {
         auxScore += leftScore + rightScore + upScore + downScore;
     }
     else if (isRow) {
-        let left = getFurthestRowTile(move[0][1], -1, 0);
-        let rightmost = getFurthestRowTile(move[0][1], 1, 12);
+        let left = getFurthestRowTile(move[0][1], -1);
+        let rightmost = getFurthestRowTile(move[0][1], 1);
         while (left <= rightmost) {
             coreScore += parseInt(board[left].innerHTML);
             left += 1;
@@ -338,8 +338,9 @@ const getScore = (isColumn, isRow) => {
     }
 }
 
-const getFurthestRowTile = (coord, offset, stopAt) => {
+const getFurthestRowTile = (coord, offset) => {
     let board = boardElem.querySelectorAll("td");
+    let stopAt = (offset > 0)? 0 : 12;
     if ((coord < 0) || (coord%13 == stopAt) || (board[coord].classList.contains("empty-tile"))) {
         return coord-offset;
     }
