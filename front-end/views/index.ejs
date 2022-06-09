@@ -16,17 +16,12 @@
     <div class="container">
         <div class="social-container">
             <div id="rooms">
-                <t2>Rooms:</t2>
-                <ul>
-                    <li>lorem</li>
-                    <li>ipsum</li>
-                    <li>dolor</li>
-                    <li>sit</li>
-                    <li>amet</li>
+                <h2>Rooms:</h2>
+                <ul id="room_list">
                 </ul>
             </div>
             <div id="players">
-                <t2>Players:</t2>
+                <h2>Players:</h2>
                 <ul>
                     <li>Lorem <span class="score">(score)</span></li>
                     <li>ipsum <span class="score">(score)</span></li>
@@ -51,12 +46,15 @@
             <div class="score-container">
                 Total score: <span id="total-score" class="score"></span>
             </div>
+            Chat:
+            <div class="chat-container" id="chat">
+            </div>
         </div>
     </div>
 
 
 	<script src="/js/game.js" type="text/javascript"></script>
-    <script type="text/javascript">fillHand(); initBoard(); getRooms();</script>
+    <script type="text/javascript">fillHand(); initBoard();</script>
 </body>
 
 </html>

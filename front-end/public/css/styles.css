@@ -98,11 +98,22 @@ td {
 }
 
 .score-container {
-    margin: 50px 0px;
+  margin: 50px 0px;
+}
+
+.chat-container {
+    height: 30rem;
+    border-width: thin;
+    border-style: solid;
 }
 
 .score {
     color: var(--open-tile-hover);
+}
+
+.chat-message {
+    margin-left: 8px;
+    padding-bottom: 0px;
 }
 /* TODO: DRY */
 #hand {

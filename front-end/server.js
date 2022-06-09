@@ -16,8 +16,9 @@ app.use(session({
 app.use(express.static(path.join(__dirname, "public")));
 
 let s;
-let rooms;
-let s_arr = {}
+let rooms = [];
+let s_arr = {};
+chat_str = {};
 
 const setupSocket = (sessionID) => {
     s = new net.Socket();
@@ -25,11 +26,20 @@ const setupSocket = (sessionID) => {
     s_arr[sessionID] = s;
     s_arr[sessionID].connect({port: 5432, host: '127.0.0.1' }, function() {
       console.log('TCP connection established with the server.');
+      //s_arr[sessionID].write('{"opcode": "QNT_OPCODE_HELLO", "length": 24, "ver_magic": "0.1.0"}');
+      s_arr[sessionID].write('{"opcode": "QNT_OPCODE_JOIN_ROOM", "room_name": "test"}');
     })
 
     s_arr[sessionID].on('data', function(chunk) {
       console.log(`Data received from the server: ${chunk.toString()}.`);
-      rooms = chunk.toString();
+      if (chunk.toString().includes("QNT_OPCODE_TELL_CHAT")) {
+        msg = JSON.parse(chunk.toString());
+        message = msg.user_name + ": " + msg.msg;
+        chat_str[msg.room_name][msg.msg_num] = message
+        console.log(chat_str[msg.room_name])
+      } else {
+        rooms = chunk.toString().split(", ");
+      }
     });
 
     s_arr[sessionID].on('end', function() {
@@ -43,12 +53,12 @@ const setupSocket = (sessionID) => {
 }
 
 app.get("/", (req, res) => {
-  res.render("index");
   console.log(req.sessionID.toString());
   if (!(req.sessionID in s_arr)) {
     setupSocket(req.sessionID);
   }
-  s_arr[req.sessionID].write('{"opcode": "QNT_OPCODE_HELLO", "length": 24, "ver_magic": "0.1.0"}');
+  s_arr[req.sessionID].write('{"opcode": "QNT_OPCODE_LIST_ROOMS"}');
+  res.render("index", {rooms: rooms});
 });
 
 app.post("/join", (req, _res) => {
@@ -57,6 +67,11 @@ app.post("/join", (req, _res) => {
   }
   console.log(req.body);
   s_arr[req.sessionID].write(`{"opcode": "QNT_OPCODE_JOIN_ROOM", "room_name": "${req.body.room_name}"}`);
+});
+
+app.post("/messages", (req, res) => {
+  console.log(req.body.room_name);
+  res.send(chat_str[req.body.room_name]);
 });
 
 app.post("/message", (req, _res) => {
@@ -71,7 +86,11 @@ app.get("/list_rooms", (req, res) => {
     setupSocket(req.sessionID);
   }
   s_arr[req.sessionID].write(`{"opcode": "QNT_OPCODE_LIST_ROOMS"}`)
-  console.log(rooms)
+  rooms.forEach((item) => {
+    if (!(item in chat_str)) {
+      chat_str[item] = {};
+    }
+  });
   res.send(rooms);
 });
 

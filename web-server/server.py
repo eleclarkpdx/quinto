@@ -9,6 +9,8 @@ global rooms
 rooms = {}
 global room_lock
 room_lock = threading.Lock()
+global cnt
+cnt = int(0)
 
 @dataclass
 class qnt_pkt_header:
@@ -55,10 +57,13 @@ class qnt_pkt_send_msg:
         self.room_name = room_name
         self.msg = msg
 
-    def send(self):
+    def send(self, connection):
+        global cnt
+        resp = '{"opcode": "QNT_OPCODE_TELL_CHAT", "user_name":"' + userInfo[connection]["user_name"] +'", "room_name":"' + self.room_name + '", "msg_num": "' + str(cnt) + '", "msg": "' + self.msg + '"}';
+        cnt += 1;
         with room_lock:
             for c in rooms[self.room_name]:
-                c.sendall(self.msg.encode())
+                c.sendall(resp.encode())
         
 class qnt_pkt_list_rooms_resp:
     header: qnt_pkt_header
@@ -94,7 +99,7 @@ class qnt_pkt_leave_room:
             del rooms[self.room_name]
         elif was_found:
             send = qnt_pkt_send_msg(qnt_pkt_header(int("0x10000007", 16), 20), self.room_name, "User has left the channel")
-            send.send();
+            send.send(connection);
 
 
 @dataclass
@@ -135,12 +140,15 @@ err_codes = {
 }
 
 clients = set()
+global userInfo;
+userInfo = {}
 clients_lock = threading.Lock()
+global num_users;
+num_users = 0;
 
 s = socket.socket()
 host = '127.0.0.1'
 port = 5432
-ThreadCount = 0
 
 try:
     s.bind((host, port))
@@ -152,10 +160,14 @@ print('Waiting for a connection...')
 s.listen(5)
 
 def threaded_client(connection, address):
+    global num_users
     print('Accepting connections from: ', address)
     #connection.send(str.encode('Connected to server\n'));
     with clients_lock:
         clients.add(connection)
+        userInfo[connection] = {}
+        userInfo[connection]["user_name"] = "User" + str(num_users);
+        num_users += 1
     try:
         while True:
             data = connection.recv(2048)
@@ -198,7 +210,7 @@ def handle_message(connection, message):
         join.join(connection)
     elif message["opcode"] == 'QNT_OPCODE_SEND_CHAT':
         send = qnt_pkt_send_msg(qnt_pkt_header(int(opcodes[message["opcode"]], 16), 0), message["room_name"], message["msg"]);
-        send.send();
+        send.send(connection);
     elif message["opcode"] == 'QNT_OPCODE_LIST_ROOMS':
         list_rooms = qnt_pkt_list_rooms_resp(qnt_pkt_header(int("0x10000005", 16), 0));
         connection.send(list_rooms.getRooms().encode());
@@ -217,5 +229,3 @@ while True:
     Client, address = s.accept()
     print('Connected to: ' +address[0] + ":" + str(address[1]))
     start_new_thread(threaded_client, (Client, address))
-    ThreadCount += 1
-    print('\tThread Number: ' + str(ThreadCount))

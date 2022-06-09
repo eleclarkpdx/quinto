@@ -29,6 +29,60 @@ submitMove.addEventListener("click", function handleClick(event) {
     move = [];
 });
 
+console.log(rooms);
+setInterval(function() {
+  var xhr = new XMLHttpRequest();
+
+  var url = '/list_rooms';
+
+  xhr.open("GET", url, false);
+  xhr.onreadystatechange = function() {
+    if (this.readyState = 4 && this.status == 200) {
+      if (this.responseText != null) {
+        if (this.responseText.length != 0) {
+          console.log(this.responseText)
+          var list = JSON.parse(this.responseText);
+          console.log("list:",list)
+          var appendData = "";
+          list.forEach((item) => {
+            console.log(item);
+            appendData += `<li>${item}</li>`
+          })
+          console.log(appendData)
+          document.getElementById("room_list").innerHTML = appendData;
+        }
+      }
+    }
+  }
+  xhr.send();
+}, 5000);
+
+setInterval(function() {
+  var xhr = new XMLHttpRequest();
+
+  var url = '/messages';
+
+  xhr.open("POST", url, false);
+  xhr.setRequestHeader("Content-Type", "application/json")
+  xhr.onreadystatechange = function() {
+    if (this.readyState = 4 && this.status == 200) {
+      if (this.responseText != null) {
+        if (this.responseText.length != 0) {
+          console.log(this.responseText);
+          var list = JSON.parse(this.responseText);
+          var appendData = "";
+          for (const item in list) {
+            console.log(list[item]);
+            appendData += `<p class="chat-message">${list[item]}</p>`
+          }
+          console.log(appendData)
+          document.getElementById("chat").innerHTML = appendData;
+        }
+      }
+    }
+  }
+  xhr.send(JSON.stringify({"room_name": "test"}));
+}, 1000);
 
 moveCancel.addEventListener("click", function handleClick(event) {
     cancelMove();
@@ -65,15 +119,6 @@ const fillHand = () => {
             }
         });
     });
-}
-
-const getRooms = () => {
-  let rooms = document.querySelector("#rooms")
-  var xmlHttp = new XMLHttpRequest();
-  xmlHttp.open("GET", "list_rooms", false);
-  xmlHttp.send(null);
-  console.log(xmlHttp.responseText);
-  rooms.innerHTML = `<t2>Rooms:</t2><ul><li>${xmlHttp.responseText}</li></ul>`
 }
 
 const initBoard = () => {
