@@ -93,7 +93,6 @@ class qnt_pkt_leave_room:
         if was_found and len(rooms[self.room_name]) == 0:
             del rooms[self.room_name]
         elif was_found:
-            print("send.send()")
             send = qnt_pkt_send_msg(qnt_pkt_header(int("0x10000007", 16), 20), self.room_name, "User has left the channel")
             send.send();
 
@@ -154,16 +153,13 @@ s.listen(5)
 
 def threaded_client(connection, address):
     print('Accepting connections from: ', address)
-    connection.send(str.encode('Connected to server\n'));
+    #connection.send(str.encode('Connected to server\n'));
     with clients_lock:
         clients.add(connection)
-        print(clients)
-        print("lock")
     try:
         while True:
             data = connection.recv(2048)
             if not data:
-                print("break")
                 break
             else:
                 print(data)
@@ -195,8 +191,8 @@ def handle_message(connection, message):
             resp = qnt_pkt_error(qnt_pkt_header(int(opcodes[message["opcode"]], 16), 4), int("0x10000011", 16))
             connection.send(resp.get_error());
             close_connection(connection);
-        else:
-            connection.send('{"opcode": "QNT_OPCODE_KEEPALIVE", "length": 0}')
+        #else:
+        #    connection.send(b'{"opcode": "QNT_OPCODE_KEEPALIVE", "length": 0}')
     elif message["opcode"] == 'QNT_OPCODE_JOIN_ROOM':
         join = qnt_pkt_join_room(qnt_pkt_header(int(opcodes[message["opcode"]], 16), 20), message["room_name"])
         join.join(connection)

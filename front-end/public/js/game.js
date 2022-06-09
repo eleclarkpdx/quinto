@@ -67,6 +67,15 @@ const fillHand = () => {
     });
 }
 
+const getRooms = () => {
+  let rooms = document.querySelector("#rooms")
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open("GET", "list_rooms", false);
+  xmlHttp.send(null);
+  console.log(xmlHttp.responseText);
+  rooms.innerHTML = `<t2>Rooms:</t2><ul><li>${xmlHttp.responseText}</li></ul>`
+}
+
 const initBoard = () => {
     for (let y = 0; y < boardHeight; ++y) {
         let newRow = document.createElement("tr");
