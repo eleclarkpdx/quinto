@@ -142,7 +142,6 @@ const moveOk = () => {
     let floating = true;
     for (let i = 0; i < move.length; ++i) {
         let tile = move[i];
-        // TODO: undefined near borders (eg if you play a tile at (11,0), then tile[1]-boardwidth is out of bounds)
         let [left, right, up, down] = [
             (board[tile[1]-1])? board[tile[1]-1].classList : null,
             (board[tile[1]+1])? board[tile[1]+1].classList : null,
