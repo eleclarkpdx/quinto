@@ -36,18 +36,16 @@ moveCancel.addEventListener("click", function handleClick(event) {
 });
 
 
-// dummy function that fills your hand
 const getTiles = (num_tiles) => {
     let arr = [];
-    for (let i = 0; i < (num_tiles+5); ++i) {
-        arr.push(i);
+    for (let i = 0; i < (num_tiles); ++i) {
+        arr.push(Math.floor((Math.random()*10)));
     }
     return arr;
 }
 
 const fillHand = () => {
     let tilesInHand = handElem.querySelectorAll("td");
-    // TDOD: replace next line with with server request
     let drawnTiles = getTiles(5 - tilesInHand.length);
     for (let i = 0; i < drawnTiles.length; ++i) {
         let newTile = document.createElement("td");
@@ -65,6 +63,15 @@ const fillHand = () => {
             }
         });
     });
+}
+
+const getRooms = () => {
+  let rooms = document.querySelector("#rooms")
+  var xmlHttp = new XMLHttpRequest();
+  xmlHttp.open("GET", "list_rooms", false);
+  xmlHttp.send(null);
+  console.log(xmlHttp.responseText);
+  rooms.innerHTML = `<h2>Rooms:</h2><ul><li>${xmlHttp.responseText}</li></ul>`
 }
 
 const initBoard = () => {
@@ -94,7 +101,6 @@ const playHand = (hand, playingThisTile) => {
     
 const playTile = (playingThisTile) => {
     playingThisTile.setAttribute("class", "playing-hand-tile");
-    //setPlayableLocations();
 
     let board = boardElem.querySelectorAll("td");
     let playableLocations = Array.from(document.querySelectorAll(".empty-tile"));
@@ -122,74 +128,30 @@ const playTile = (playingThisTile) => {
     }
 }
 
-/*
-// wildly inefficient
-const setPlayableLocations = () => {
-    let openTiles = boardElem.querySelectorAll(".open-tile");
-    openTiles.forEach((tile) => {
-        tile.removeAttribute("class");
-    });
-
-    if (state == "thinking") {
-        let board = boardElem.querySelectorAll("td");
-        let occupied = []; 
-        for (let x = 0; x < boardWidth; ++x) {
-            for (let y = 0; y < boardHeight; ++y) {
-                if (board[(boardWidth*y) + x].innerHTML != " ") {
-                    occupied.push([x, y]);
-                }
-            }
-        }
-        // TODO: DRY
-        for (let i = 0; i < occupied.length; ++i) {
-            let up = board[boardWidth*(occupied[i][1]-1) + occupied[i][0]];
-            if (up.innerHTML == " ") {
-                up.setAttribute("class","open-tile");
-            }
-            let down = board[boardWidth*(occupied[i][1]+1) + occupied[i][0]];
-            if (down.innerHTML == " ") {
-                down.setAttribute("class","open-tile");
-            }
-            let left = board[(boardWidth*occupied[i][1]) + (occupied[i][0]-1)];
-            if (left.innerHTML == " ") {
-                left.setAttribute("class","open-tile");
-            }
-            let right = board[(boardWidth*occupied[i][1]) + (occupied[i][0]+1)];
-            if (right.innerHTML == " ") {
-                right.setAttribute("class","open-tile");
-            }
-        }
-    }
-    else if (state == "playing") {
-        let lastMove = move[move.length - 1];
-        let upOccupied = ((lastMove[1]-boardWidth) !== " ");
-        let downOccupied = ((lastMove[1]+boardWidth) !== " ");
-        let leftOccupied = ((lastMove[1]-1) !== " ");
-        let rightOccupied = ((lastMove[1]+1) !== " ");
-        if leftOccupied
-    }
-}
-*/
-
 // a move must
 // 1) touch a pre-existing tile
 // 2) be played in a line
 // 3) not cause the board to contain more than 5 tiles in sequence without empty spaces
 // 4) sum to a multiple of 5 on all axes
 const moveOk = () => {
+    //skipping your turn is always okay
+    if (move.length === 0) {
+        return true;
+    }
     let board = boardElem.querySelectorAll("td");
     let floating = true;
     for (let i = 0; i < move.length; ++i) {
         let tile = move[i];
-        // TODO: undefined near borders (eg if you play a tile at (11,0), then tile[1]-boardwidth is out of bounds)
-        let left = board[tile[1]-1].classList;
-        let right = board[tile[1]+1].classList;
-        let up = board[tile[1]-boardWidth].classList;
-        let down = board[tile[1]+boardWidth].classList;
-        if (!((left.contains("empty-tile") || left.contains("playing-tile")) &&
-            (right.contains("empty-tile") || right.contains("playing-tile")) &&
-            (up.contains("empty-tile") || up.contains("playing-tile")) &&
-            (down.contains("empty-tile") || down.contains("playing-tile")))) {
+        let [left, right, up, down] = [
+            (board[tile[1]-1])? board[tile[1]-1].classList : null,
+            (board[tile[1]+1])? board[tile[1]+1].classList : null,
+            (board[tile[1]-13])? board[tile[1]-13].classList : null,
+            (board[tile[1]+13])? board[tile[1]+13].classList : null,
+        ]
+        if ((left !== null && left.contains("played-tile")) ||
+            (right !== null && right.contains("played-tile")) || 
+            (up !== null && up.contains("played-tile")) || 
+            (down !== null && down.contains("played-tile"))) {
             floating = false;
         }
     };
@@ -239,7 +201,7 @@ const moveOk = () => {
     for (let x = 0; x < boardWidth; ++x) {
         for (let y = 0; y < boardHeight; ++y) {
             yCoord = y * boardWidth;
-            if (board[yCoord + x].classList.contains("empty-tile")) {
+            if (((yCoord + x)%13 === 0) || board[yCoord + x].classList.contains("empty-tile")) {
                 if (colCount > maxColCount) {
                     maxColCount = colCount;
                 }
@@ -258,7 +220,7 @@ const moveOk = () => {
     for (let y = 0; y < boardHeight; ++y) {
         for (let x = 0; x < boardWidth; ++x) {
             yCoord = y * boardWidth;
-            if (board[yCoord + x].classList.contains("empty-tile")) {
+            if (((yCoord + x)%13 === 0) || board[yCoord + x].classList.contains("empty-tile")) {
                 if (rowCount > maxRowCount) {
                     maxRowCount = rowCount;
                 }
@@ -323,8 +285,8 @@ const getScore = (isColumn, isRow) => {
         auxScore += leftScore + rightScore + upScore + downScore;
     }
     else if (isRow) {
-        let left = getFurthestRowTile(move[0][1], -1, 0);
-        let rightmost = getFurthestRowTile(move[0][1], 1, 12);
+        let left = getFurthestRowTile(move[0][1], -1);
+        let rightmost = getFurthestRowTile(move[0][1], 1);
         while (left <= rightmost) {
             coreScore += parseInt(board[left].innerHTML);
             left += 1;
@@ -376,9 +338,10 @@ const getScore = (isColumn, isRow) => {
     }
 }
 
-const getFurthestRowTile = (coord, offset, stopAt) => {
+const getFurthestRowTile = (coord, offset) => {
     let board = boardElem.querySelectorAll("td");
-    if ((coord%13 == stopAt) || (board[coord].classList.contains("empty-tile"))) {
+    let stopAt = (offset > 0)? 0 : 12;
+    if ((coord < 0) || (coord%13 == stopAt) || (board[coord].classList.contains("empty-tile"))) {
         return coord-offset;
     }
     else {
@@ -412,7 +375,7 @@ const sumRight = (coord) => {
         return 0;
     }
     else {
-        return parseInt(board[coord].innerHTML) + sumLeft(coord+1);
+        return parseInt(board[coord].innerHTML) + sumRight(coord+1);
     }
 }
 
@@ -422,7 +385,7 @@ const sumUp = (coord) => {
         return 0;
     }
     else {
-        return parseInt(board[coord].innerHTML) + sumLeft(coord-boardWidth);
+        return parseInt(board[coord].innerHTML) + sumUp(coord-boardWidth);
     }
 }
 
@@ -432,6 +395,6 @@ const sumDown = (coord) => {
         return 0;
     }
     else {
-        return parseInt(board[coord].innerHTML) + sumLeft(coord+boardWidth);
+        return parseInt(board[coord].innerHTML) + sumDown(coord+boardWidth);
     }
 }
